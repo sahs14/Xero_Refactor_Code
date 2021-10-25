@@ -7,7 +7,7 @@ namespace API.Entities
 {
     public class Product
     { 
-        public int id  { get; set; }
+        public int Id  { get; set; }
         public string Name { get; set; }
 
         public string Description { get; set; }
@@ -15,5 +15,7 @@ namespace API.Entities
         public decimal Price { get; set; }
 
         public decimal DeliveryPrice { get; set; }
+
+        public ICollection<ProductOption> ProductOpt { get; set; }
     }
 }

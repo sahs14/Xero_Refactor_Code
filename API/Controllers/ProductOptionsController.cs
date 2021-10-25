@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using API.Data;
 using API.DTOs;
 using API.Entities;
+using API.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -14,22 +15,23 @@ namespace API.Controllers
      [Authorize]
     public class ProductOptionsController : BaseApiController
     {
-        private readonly DataContext _context;
-        public ProductOptionsController(DataContext context)
+         private readonly IProductOptionService _productOptionService;
+        public ProductOptionsController(IProductOptionService productOptionService)
         {
-            _context = context;
-        }
+           _productOptionService = productOptionService;
+        } 
 
         [HttpGet("{productId}/options")]
-        public async Task<ActionResult<List<ProductOption>>> GetProductOptions()
+        public async Task<ActionResult<IEnumerable<ProductOption>>> GetProductOptions(int productId)
         {
-          return await _context.ProductOption.ToListAsync();
+          var result = await _productOptionService.GetProductOptions(productId);
+          return Ok(result);
         }
         
         [HttpGet("{productId}/options/{id}")]
-        public async  Task<ActionResult<ProductOption>> GetProductOption(int id)
+        public async  Task<ActionResult<ProductOption>> GetProductOption(int productId, int id)
         {
-            return await _context.ProductOption.FindAsync(id);
+            return await _productOptionService.GetProductOptionById(productId, id);
         }
         
         [HttpPost]

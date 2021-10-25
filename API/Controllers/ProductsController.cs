@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using API.Data;
 using API.DTOs;
 using API.Entities;
+using API.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -14,26 +15,32 @@ namespace API.Controllers
      [Authorize]
     public class ProductsController : BaseApiController
     {
-        private readonly DataContext _context;
-        public ProductsController(DataContext context)
+         private readonly IProductService _productService;
+        public ProductsController(IProductService productService)
         {
-            _context = context;
+            _productService = productService;
         }
 
         [HttpGet]
-        public async Task<ActionResult<List<Product>>> GetProducts()
+        public async Task<ActionResult<IEnumerable<Product>>> GetProducts()
         {
-          return await _context.Product.ToListAsync();
+          var result =  await _productService.GetProducts();
+          return Ok(result);
         }
         
         [HttpGet("{id}")]
         public async  Task<ActionResult<Product>> GetProduct(int id)
         {
-            return await _context.Product.FindAsync(id);
+            var product = await _productService.GetProductById(id);
+            if (product == null)
+            {
+                return NotFound("Product does not exist");
+            }
+            return Ok(product);
         }
 
         [HttpPost]
-        public async Task<ActionResult> PostProduct(ProductDto productDto)
+        public async Task<ActionResult> CreateProduct(ProductDto productDto)
         {
             //product.Save();
             return Ok();
