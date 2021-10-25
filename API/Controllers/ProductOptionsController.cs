@@ -6,6 +6,7 @@ using API.Data;
 using API.DTOs;
 using API.Entities;
 using API.Interfaces;
+using API.Validators;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -37,6 +38,13 @@ namespace API.Controllers
         [HttpPost("{productId}/options")]
         public async Task<ActionResult> Post(int productId, [FromBody] ProductOptionDto productOptionDto)
         {
+            if (productId == default(int))
+                return BadRequest();
+
+            var ret = productOptionDto.Validate();
+            if (ret.Count > 0)
+                return BadRequest(ret);
+
             await _productOptionService.CreateProductOption(productId, productOptionDto);
             return Ok();
            
@@ -45,13 +53,35 @@ namespace API.Controllers
         [HttpPut("{productId}/options/{id}")]
         public async Task<ActionResult> Put(int id, int productId, [FromBody] ProductOptionDto productOptionDto)
         {
+            if (id == default(int) || productId == default(int))
+                return BadRequest();
+
+            var productOption = await _productOptionService.GetProductOptionById(productId, id);
+            if (productOption == null)
+            {
+                return NotFound("Product does not exist");
+            }
+
+            var ret = productOptionDto.Validate();
+            if (ret.Count > 0)
+                return BadRequest(ret);
+
             await _productOptionService.UpdateProductOption(id, productId, productOptionDto);
             return Ok();
         }
 
         [HttpDelete("{productId}/options/{id}")]
-        public async Task<ActionResult> Delete(int id)
+        public async Task<ActionResult> Delete(int id, int productId)
         {
+            if (id == default(int))
+                return BadRequest();
+
+            var productOption = await _productOptionService.GetProductOptionById(productId, id);
+            if (productOption == null)
+            {
+                return NotFound("Product does not exist");
+            }
+
             await _productOptionService.DeleteProductOption(id);
             return Ok();
         }
