@@ -4,16 +4,17 @@ using System.Linq;
 using System.Threading.Tasks;
 using API.Entities;
 using API.DTOs;
+using Microsoft.AspNetCore.Mvc;
 
 namespace API.Interfaces
 {
     public interface IProductRepository
     {
-        void UpdateProduct(Product product);
+        Task UpdateProduct(int id, ProductDto productDto);
 
-        void CreateProduct(Product product);
+        Task CreateProduct(ProductDto productDto);
 
-        void DeleteProduct(int Id);
+        Task DeleteProduct(int Id);
 
         Task<Product> GetProductById(int id);
         Task<IEnumerable<Product>> GetProducts();

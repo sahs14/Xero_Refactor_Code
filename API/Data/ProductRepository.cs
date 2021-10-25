@@ -2,8 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using API.DTOs;
 using API.Entities;
 using API.Interfaces;
+using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 
 namespace API.Data
@@ -11,21 +13,25 @@ namespace API.Data
     public class ProductRepository : IProductRepository
     {
         private readonly DataContext _context;
-        public ProductRepository(DataContext context)
+        private readonly IMapper _mapper;
+        public ProductRepository(DataContext context, IMapper mapper)
         {
             _context = context;
-        }
-        public void UpdateProduct(Product product) {
-              _context.Products.Update(product);
+             _mapper = mapper;
         }
 
-        public void CreateProduct(Product product){
-              _context.Products.Add(product);
+        public async Task CreateProduct(ProductDto productDto){
+
+            var product = _mapper.Map<Product>(productDto);
+            _context.Products.Add(product);
+            await _context.SaveChangesAsync();
         }
 
-        public void DeleteProduct(int Id) {            
-            var product = _context.Products.FirstOrDefault(x => x.Id == Id);
-             _context.Products.Remove(product);}
+        public async Task DeleteProduct(int Id) {            
+            var product = await _context.Products.FindAsync(Id);
+            _context.Products.Remove(product);
+            await _context.SaveChangesAsync();
+        }
 
         public async Task<Product> GetProductById(int id) {
             return await _context.Products.FindAsync(id);
@@ -33,6 +39,16 @@ namespace API.Data
         public async Task<IEnumerable<Product>> GetProducts(){
             return await _context.Products.ToListAsync();
 
+        }
+
+        public async Task UpdateProduct(int id, ProductDto productDto)
+        {
+
+            var productNew = _mapper.Map<Product>(productDto);
+            productNew.Id = id;
+            var productOld = await _context.Products.FindAsync(id);
+            _context.Entry(productOld)?.CurrentValues.SetValues(productNew);
+            await _context.SaveChangesAsync();
         }
     }
 }

@@ -17,5 +17,16 @@ namespace API.Data
         public DbSet<AppUser> Users { get; set; }
 
         public DbSet<ProductOption> ProductOptions { get; set; }
+
+        protected override void OnModelCreating(ModelBuilder builder)
+        {
+            base.OnModelCreating(builder);
+
+            builder.Entity<Product>()
+                .HasMany(x => x.ProductOpt)
+                .WithOne(X => X.Product)
+                .OnDelete(DeleteBehavior.Cascade);
+        }
+
     }
 }

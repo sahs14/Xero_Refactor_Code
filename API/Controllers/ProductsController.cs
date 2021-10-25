@@ -40,21 +40,24 @@ namespace API.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult> CreateProduct(ProductDto productDto)
+        public async Task<ActionResult> Post([FromBody] ProductDto productDto)
         {
-            //product.Save();
+            await _productService.CreateProduct(productDto);
             return Ok();
+           
         }
 
         [HttpPut("{id}")]
-        public async Task<ActionResult> UpdateProduct(int id, ProductDto productDto)
+        public async Task<ActionResult> Put(int id, [FromBody] ProductDto productDto)
         {
+            await _productService.UpdateProduct(id, productDto);
             return Ok();
         }
 
         [HttpDelete("{id}")]
-        public async Task<ActionResult> DeleteProduct(int id)
+        public async Task<ActionResult> Delete(int id)
         {
+            await _productService.DeleteProduct(id);
             return Ok();
         }
 

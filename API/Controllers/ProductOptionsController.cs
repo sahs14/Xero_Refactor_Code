@@ -34,22 +34,25 @@ namespace API.Controllers
             return await _productOptionService.GetProductOptionById(productId, id);
         }
         
-        [HttpPost]
-        public async Task<ActionResult> CreateProductOption(ProductOptionDto productDto)
+        [HttpPost("{productId}/options")]
+        public async Task<ActionResult> Post(int productId, [FromBody] ProductOptionDto productOptionDto)
         {
-            //product.Save();
+            await _productOptionService.CreateProductOption(productId, productOptionDto);
+            return Ok();
+           
+        }
+
+        [HttpPut("{productId}/options/{id}")]
+        public async Task<ActionResult> Put(int id, int productId, [FromBody] ProductOptionDto productOptionDto)
+        {
+            await _productOptionService.UpdateProductOption(id, productId, productOptionDto);
             return Ok();
         }
 
-        [HttpPut("{id}")]
-        public async Task<ActionResult> UpdateProductOption(int id, ProductOptionDto productDto)
+        [HttpDelete("{productId}/options/{id}")]
+        public async Task<ActionResult> Delete(int id)
         {
-            return Ok();
-        }
-
-        [HttpDelete("{id}")]
-        public async Task<ActionResult> DeleteProductOption(int id)
-        {
+            await _productOptionService.DeleteProductOption(id);
             return Ok();
         }
 
