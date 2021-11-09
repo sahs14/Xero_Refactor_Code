@@ -55,11 +55,8 @@ namespace API.Controllers
         public async Task<ActionResult> Put(int id, [FromBody] ProductDto productDto)
         {
 
-            if (id == default(int))
-                return BadRequest();
-
-            var product = await _productService.GetProductById(id);
-            if (product == null)
+            var result = await _productService.ModifyProduct(id, productDto);
+            if(result.IsSuccess)
             {
                 return NotFound("Product does not exist");
             }
