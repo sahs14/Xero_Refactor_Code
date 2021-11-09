@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using API.Data;
 using API.DTOs;
 using API.Entities;
+using API.Errors;
 using API.Interfaces;
 using API.Validators;
 using Microsoft.AspNetCore.Authorization;
@@ -38,15 +39,19 @@ namespace API.Controllers
         [HttpPost("{productId}/options")]
         public async Task<ActionResult> Post(int productId, [FromBody] ProductOptionDto productOptionDto)
         {
-            if (productId == default(int))
-                return BadRequest();
-
-            var ret = productOptionDto.Validate();
-            if (ret.Count > 0)
-                return BadRequest(ret);
-
-            await _productOptionService.CreateProductOption(productId, productOptionDto);
-            return Ok();
+            var result = await _productOptionService.CreateProductOption(productId, productOptionDto);
+            if(result.IsSuccess){
+                return Ok(result.ReturnMessage);
+            }
+            else{
+                if(result.errorType == ErrorType.NotFound){
+                    return NotFound(result.ReturnMessage);
+                }
+                else
+                {
+                    return BadRequest(result.ReturnMessage);
+                }
+            }
            
         }
 

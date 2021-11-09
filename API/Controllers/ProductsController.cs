@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using API.Data;
 using API.DTOs;
 using API.Entities;
+using API.Errors;
 using API.Interfaces;
 using API.Validators;
 using Microsoft.AspNetCore.Authorization;
@@ -30,7 +31,7 @@ namespace API.Controllers
           return Ok(product);
         }
         
-        [HttpGet("{id}")]
+        [HttpGet("{id}")]                    
         public async  Task<ActionResult<Product>> GetProduct(int id)
         {
             return await _productService.GetProductById(id);
@@ -39,37 +40,44 @@ namespace API.Controllers
         [HttpPost]
         public async Task<ActionResult> Post([FromBody] ProductDto productDto)
         {
-            var ret = productDto.Validate();
-
-            if (ret.Count > 0)
-                return BadRequest(ret);
-
-            await _productService.CreateProduct(productDto);
-
-            string returnMessage = $"Product Created";
-            return Ok(returnMessage);
+            var result = await _productService.CreateProduct(productDto);
+            if(result.IsSuccess){
+                return Ok(result.ReturnMessage);
+            }
+            else{
+                if(result.errorType == ErrorType.NotFound){
+                    return NotFound(result.ReturnMessage);
+                }
+                else
+                {
+                    return BadRequest(result.ReturnMessage);
+                }
+            }
            
         }
 
-        [HttpPut("{id}")]
-        public async Task<ActionResult> Put(int id, [FromBody] ProductDto productDto)
-        {
+        // [HttpPut("{id}")]
+        // public async Task<ActionResult> Put(int id, [FromBody] ProductDto productDto)
+        // {
 
-            var result = await _productService.ModifyProduct(id, productDto);
-            if(result.IsSuccess)
-            {
-                return NotFound("Product does not exist");
-            }
+        //     if (id == default(int))
+        //         return BadRequest();
+
+        //     var product = await _productService.GetProductById(id);
+        //     if (product == null)
+        //     {
+        //         return NotFound("Product does not exist");
+        //     }
             
-            var ret = productDto.Validate();
-            if (ret.Count > 0 )
-                return BadRequest(ret);
+        //     var ret = productDto.Validate();
+        //     if (ret.Count > 0 )
+        //         return BadRequest(ret);
 
-            string returnMessage = $"Product Updated";
+        //     string returnMessage = $"Product Updated";
 
-            await _productService.UpdateProduct(id, productDto);
-            return Ok(returnMessage);
-        }
+        //     await _productService.UpdateProduct(id, productDto);
+        //     return Ok(returnMessage);
+        // }
 
         [HttpDelete("{id}")]
         public async Task<ActionResult> Delete(int id)
@@ -86,6 +94,25 @@ namespace API.Controllers
             string returnMessage = $"Product Deleted";
             await _productService.DeleteProduct(id);
             return Ok(returnMessage);
+        }
+
+        [HttpPut("{id}")]
+        public async Task<ActionResult> Put(int id, [FromBody] ProductDto productDto)
+        {
+            var result = await _productService.ModifyProduct(id,productDto);
+            if(result.IsSuccess){
+                return Ok(result.ReturnMessage);
+            }
+            else{
+                if(result.errorType == ErrorType.NotFound){
+                    return NotFound(result.ReturnMessage);
+                }
+                else
+                {
+                    return BadRequest(result.ReturnMessage);
+                }
+            }
+
         }
 
 

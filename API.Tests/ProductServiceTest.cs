@@ -6,6 +6,7 @@ using API.Services;
 using API.Entities;
 using API.DTOs;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 
 namespace API.Tests
 {
@@ -13,12 +14,13 @@ namespace API.Tests
     public class ProductServiceTest
     {
         private readonly Mock<IProductRepository> _productRepositoryMock = new Mock<IProductRepository>();
+        private readonly Mock<ILogger<ProductService>> _loggerMock = new Mock<ILogger<ProductService>>();
         private ProductService _productService;
 
         [TestInitialize]
         public void Initialise()
         {
-            _productService = new ProductService(_productRepositoryMock.Object);
+            _productService = new ProductService(_productRepositoryMock.Object, _loggerMock.Object);
         }
 
         [TestMethod]
@@ -69,6 +71,80 @@ namespace API.Tests
             await _productService.UpdateProduct(Id,productDtoModified);
 
             _productRepositoryMock.Verify(x => x.UpdateProduct(Id, productDtoModified), Times.Once());
+
+        }
+
+         [TestMethod]
+        public async Task ModifyProduct_sucess()
+        {
+            //Arrange
+            int Id = 100;
+
+            var productDtoOld = new ProductDto()
+            {
+                Name = "Book",
+                Description = "Fiction Books",
+                Price = 10,
+                DeliveryPrice = 12
+            };
+
+
+            var productDtoModified = new ProductDto()
+                {
+                    Name = "Book",
+                    Description = "All Books",
+                    Price = 50,
+                    DeliveryPrice = 60
+                };
+
+
+            _productRepositoryMock.Setup(x => x.GetProductById(Id)).ReturnsAsync((Product)null);
+
+            _productRepositoryMock.Setup(x => x.UpdateProduct(Id, productDtoModified)).Verifiable();
+
+            //Act
+            var result = await _productService.ModifyProduct(Id,productDtoModified);
+
+            Assert.AreEqual("Product updated", result.ReturnMessage[0]);
+            Assert.IsTrue(result.IsSuccess);
+            _productRepositoryMock.Verify(x => x.UpdateProduct(Id, productDtoModified), Times.Once());
+
+        }
+
+        [TestMethod]
+        public async Task ModifyProduct_fail()
+        {
+            //Arrange
+            int Id = 0;
+
+            var productDtoOld = new ProductDto()
+            {
+                Name = "Book",
+                Description = "Fiction Books",
+                Price = 10,
+                DeliveryPrice = 12
+            };
+
+
+            var productDtoModified = new ProductDto()
+                {
+                    Name = "Book",
+                    Description = "All Books",
+                    Price = 50,
+                    DeliveryPrice = 60
+                };
+
+
+            _productRepositoryMock.Setup(x => x.GetProductById(Id)).ReturnsAsync((Product)null);
+
+            _productRepositoryMock.Setup(x => x.UpdateProduct(Id, productDtoModified)).Verifiable();
+
+            //Act
+            var result = await _productService.ModifyProduct(Id,productDtoModified);
+
+            Assert.AreEqual("Product Id invalid", result.ReturnMessage[0]);
+            Assert.IsFalse(result.IsSuccess);
+            _productRepositoryMock.Verify(x => x.UpdateProduct(Id, productDtoModified), Times.Never());
 
         }
 

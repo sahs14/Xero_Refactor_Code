@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using API.DTOs;
 using API.Entities;
+using API.Errors;
 using Microsoft.AspNetCore.Mvc;
 
 namespace API.Interfaces
@@ -12,11 +13,12 @@ namespace API.Interfaces
     {
         Task<Product> GetProductById(int id);
         Task<IEnumerable<Product>> GetProducts();
-        Task CreateProduct(ProductDto productDto);
+        Task<ManageResult> CreateProduct(ProductDto productDto);
 
         Task UpdateProduct(int id, ProductDto productDto);
+        Task<ManageResult> ModifyProduct(int id, ProductDto productDto);
+
+        Task<Product> GetProductByProductOption(int id);
         Task DeleteProduct(int id);
-
-
     }
 }

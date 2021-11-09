@@ -6,6 +6,7 @@ using API.Services;
 using API.Entities;
 using API.DTOs;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 
 namespace API.Tests
 {
@@ -13,26 +14,32 @@ namespace API.Tests
     public class ProductOptionsServiceTest
     {
         private readonly Mock<IProductOptionRepository> _productOptionRepositoryMock = new Mock<IProductOptionRepository>();
+        private readonly Mock<ILogger<ProductOptionService>> _loggerMock = new Mock<ILogger<ProductOptionService>>();
+
+        private readonly Mock<IProductRepository> _productRepositoryMock = new Mock<IProductRepository>();
+
         private ProductOptionService _productOptionService;
 
         [TestInitialize]
         public void Initialise()
         {
-            _productOptionService = new ProductOptionService(_productOptionRepositoryMock.Object);
+            _productOptionService = new ProductOptionService(_productOptionRepositoryMock.Object, _productRepositoryMock.Object,_loggerMock.Object);
         }
 
         [TestMethod]
-        public async Task CreateProduct()
+        public async Task CreateProduct_success()
         {
             var prdDTO = new ProductOptionDto()
             {
                 Name = "Television",
                 Description = "41 inch Television",
             };
-            int productId = 1;
+            int productId = 3;
 
-            await _productOptionService.CreateProductOption(productId, prdDTO);
+            var result = await _productOptionService.CreateProductOption(productId, prdDTO);
 
+            Assert.AreEqual("ProductOption Added", result.ReturnMessage[0]);
+            Assert.IsTrue(result.IsSuccess);
             _productOptionRepositoryMock.Verify(x => x.CreateProductOption(productId, prdDTO), Times.Once());
         }
 

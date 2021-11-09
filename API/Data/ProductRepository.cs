@@ -43,12 +43,15 @@ namespace API.Data
 
         public async Task UpdateProduct(int id, ProductDto productDto)
         {
-
             var productNew = _mapper.Map<Product>(productDto);
             productNew.Id = id;
             var productOld = await _context.Products.FindAsync(id);
             _context.Entry(productOld)?.CurrentValues.SetValues(productNew);
             await _context.SaveChangesAsync();
+        }
+
+        public async Task<Product> GetProductByProductOption(int id) {
+            return await _context.Products.Where(x=> x.Id == id).Include(x => x.ProductOpt).FirstOrDefaultAsync();
         }
     }
 }

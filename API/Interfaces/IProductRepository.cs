@@ -17,6 +17,9 @@ namespace API.Interfaces
         Task DeleteProduct(int Id);
 
         Task<Product> GetProductById(int id);
+        
         Task<IEnumerable<Product>> GetProducts();
+
+         Task<Product>  GetProductByProductOption(int id);
     }
 }
