@@ -55,12 +55,12 @@ namespace API.Tests
 
 
             var productDtoModified = new ProductDto()
-                {
-                    Name = "Book",
-                    Description = "All Books",
-                    Price = 50,
-                    DeliveryPrice = 60
-                };
+            {
+                Name = "Book",
+                Description = "All Books",
+                Price = 50,
+                DeliveryPrice = 60
+            };
 
 
             _productRepositoryMock.Setup(x => x.GetProductById(Id)).ReturnsAsync((Product)null);
@@ -68,19 +68,19 @@ namespace API.Tests
             _productRepositoryMock.Setup(x => x.UpdateProduct(Id, productDtoModified)).Verifiable();
 
             //Act
-            await _productService.UpdateProduct(Id,productDtoModified);
+            await _productService.UpdateProduct(Id, productDtoModified);
 
             _productRepositoryMock.Verify(x => x.UpdateProduct(Id, productDtoModified), Times.Once());
 
         }
 
-         [TestMethod]
+        [TestMethod]
         public async Task ModifyProduct_sucess()
         {
             //Arrange
             int Id = 100;
 
-            var productDtoOld = new ProductDto()
+            var productDtoOld = new Product()
             {
                 Name = "Book",
                 Description = "Fiction Books",
@@ -90,20 +90,20 @@ namespace API.Tests
 
 
             var productDtoModified = new ProductDto()
-                {
-                    Name = "Book",
-                    Description = "All Books",
-                    Price = 50,
-                    DeliveryPrice = 60
-                };
+            {
+                Name = "Book",
+                Description = "All Books",
+                Price = 50,
+                DeliveryPrice = 60
+            };
 
 
-            _productRepositoryMock.Setup(x => x.GetProductById(Id)).ReturnsAsync((Product)null);
+            _productRepositoryMock.Setup(x => x.GetProductById(Id)).ReturnsAsync(productDtoOld);
 
             _productRepositoryMock.Setup(x => x.UpdateProduct(Id, productDtoModified)).Verifiable();
 
             //Act
-            var result = await _productService.ModifyProduct(Id,productDtoModified);
+            var result = await _productService.ModifyProduct(Id, productDtoModified);
 
             Assert.AreEqual("Product updated", result.ReturnMessage[0]);
             Assert.IsTrue(result.IsSuccess);
@@ -127,12 +127,12 @@ namespace API.Tests
 
 
             var productDtoModified = new ProductDto()
-                {
-                    Name = "Book",
-                    Description = "All Books",
-                    Price = 50,
-                    DeliveryPrice = 60
-                };
+            {
+                Name = "Book",
+                Description = "All Books",
+                Price = 50,
+                DeliveryPrice = 60
+            };
 
 
             _productRepositoryMock.Setup(x => x.GetProductById(Id)).ReturnsAsync((Product)null);
@@ -140,7 +140,7 @@ namespace API.Tests
             _productRepositoryMock.Setup(x => x.UpdateProduct(Id, productDtoModified)).Verifiable();
 
             //Act
-            var result = await _productService.ModifyProduct(Id,productDtoModified);
+            var result = await _productService.ModifyProduct(Id, productDtoModified);
 
             Assert.AreEqual("Product Id invalid", result.ReturnMessage[0]);
             Assert.IsFalse(result.IsSuccess);
@@ -151,7 +151,7 @@ namespace API.Tests
         [TestMethod]
         public async Task DeleteProduct()
         {
-            
+
             //Arrange
             int Id = 200;
 
@@ -178,7 +178,7 @@ namespace API.Tests
         {
 
             //Arrange
-            int Id=300;
+            int Id = 300;
 
             var prdDTO = new Product()
             {
@@ -198,7 +198,7 @@ namespace API.Tests
             Assert.AreEqual("Phone", result.Name);
         }
 
-        
+
         [TestMethod]
         public async Task GetProducts()
         {

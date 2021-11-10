@@ -1,32 +1,32 @@
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using API;
-using Moq;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using API.DTOs;
+using API.Entities;
 using API.Interfaces;
 using API.Services;
-using API.Entities;
-using API.DTOs;
-using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
+using Moq;
+using Xunit;
 
-namespace API.Tests
+namespace APIXunit.Tests
 {
-    [TestClass]
     public class ProductOptionsServiceTest
     {
-        private readonly Mock<IProductOptionRepository> _productOptionRepositoryMock = new Mock<IProductOptionRepository>();
+         private readonly Mock<IProductOptionRepository> _productOptionRepositoryMock = new Mock<IProductOptionRepository>();
         private readonly Mock<ILogger<ProductOptionService>> _loggerMock = new Mock<ILogger<ProductOptionService>>();
 
         private readonly Mock<IProductRepository> _productRepositoryMock = new Mock<IProductRepository>();
 
         private ProductOptionService _productOptionService;
 
-        [TestInitialize]
-        public void Initialise()
+        public ProductOptionsServiceTest()
         {
             _productOptionService = new ProductOptionService(_productOptionRepositoryMock.Object, _productRepositoryMock.Object,_loggerMock.Object);
         }
 
-        [TestMethod]
+        [Fact]
         public async Task CreateProduct_success()
         {
             var productDtoOld = new Product()
@@ -36,7 +36,7 @@ namespace API.Tests
                 Price = 10,
                 DeliveryPrice = 12
             };
-
+            
             var prdDTO = new ProductOptionDto()
             {
                 Name = "Television",
@@ -48,67 +48,12 @@ namespace API.Tests
 
             var result = await _productOptionService.CreateProductOption(productId, prdDTO);
 
-            Assert.AreEqual("ProductOption Added", result.ReturnMessage[0]);
-            Assert.IsTrue(result.IsSuccess);
+            Assert.Same("ProductOption Added", result.ReturnMessage[0]);
+            Assert.True(result.IsSuccess);
             _productOptionRepositoryMock.Verify(x => x.CreateProductOption(productId, prdDTO), Times.Once());
         }
 
-        [TestMethod]
-        public async Task UpdateProduct()
-        {
-            //Arrange
-            int Id = 100;
-
-            var productDtoOld = new ProductOptionDto()
-            {
-                Name = "Book",
-                Description = "Fiction Books",
-            };
-
-
-            var productDtoModified = new ProductOptionDto()
-                {
-                    Name = "Book",
-                    Description = "All Books",
-                };
-            int productId = 1;
-
-            _productOptionRepositoryMock.Setup(x => x.GetProductOptionById(productId, Id)).ReturnsAsync((ProductOption)null);
-
-            _productOptionRepositoryMock.Setup(x => x.UpdateProductOption(Id, productId, productDtoModified)).Verifiable();
-
-            //Act
-            await _productOptionService.UpdateProductOption(Id, productId, productDtoModified);
-
-            _productOptionRepositoryMock.Verify(x => x.UpdateProductOption(Id, productId, productDtoModified), Times.Once());
-
-        }
-
-        [TestMethod]
-        public async Task DeleteProduct()
-        {
-            
-            //Arrange
-            int Id = 200;
-
-            var prdDTO = new ProductOptionDto()
-            {
-                Name = "Phone",
-                Description = "Mobile Phone list"
-            };
-             int productId = 1;
-
-            _productOptionRepositoryMock.Setup(x => x.GetProductOptionById(productId, Id)).ReturnsAsync((ProductOption)null);
-
-            _productOptionRepositoryMock.Setup(x => x.DeleteProductOption(Id)).Verifiable();
-
-            //Act
-            await _productOptionService.DeleteProductOption(Id);
-
-            _productOptionRepositoryMock.Verify(x => x.DeleteProductOption(Id), Times.Once());
-        }
-
-        [TestMethod]
+        [Fact]
         public async Task GetProductById()
         {
 
@@ -128,12 +73,12 @@ namespace API.Tests
             var result = await _productOptionService.GetProductOptionById(productId, Id);
 
             //Assert
-            Assert.IsInstanceOfType(result, typeof(ProductOption));
-            Assert.AreEqual("Phone", result.Name);
+            Assert.IsType<ProductOption>(result);
+            Assert.Equal("Phone", result.Name);
         }
 
         
-        [TestMethod]
+        [Fact]
         public async Task GetProducts()
         {
 
@@ -156,7 +101,8 @@ namespace API.Tests
             var result = await _productOptionService.GetProductOptions(productId);
 
             //Assert
-            Assert.IsInstanceOfType(result, typeof(ProductOption[]));
+            Assert.IsType<ProductOption[]>(result);
         }
+        
     }
 }

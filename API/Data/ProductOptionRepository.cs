@@ -17,19 +17,21 @@ namespace API.Data
         public ProductOptionRepository(DataContext context, IMapper mapper)
         {
             _context = context;
-             _mapper = mapper;
+            _mapper = mapper;
         }
-        public async Task CreateProductOption(int productId, ProductOptionDto productOptionDto){
+        public async Task CreateProductOption(int productId, ProductOptionDto productOptionDto)
+        {
 
             var productOption = _mapper.Map<ProductOption>(productOptionDto);
-           // productOption.productId = productId;
+            // productOption.productId = productId;
             var product = _context.Products.Include(x => x.ProductOpt).Where(x => x.Id == productId).First();
             product?.ProductOpt?.Add(productOption);
 
             await _context.SaveChangesAsync();
         }
 
-        public async Task DeleteProductOption(int id) {            
+        public async Task DeleteProductOption(int id)
+        {
             var productOption = await _context.ProductOptions.FindAsync(id);
             _context.ProductOptions.Remove(productOption);
             await _context.SaveChangesAsync();
@@ -46,13 +48,15 @@ namespace API.Data
             await _context.SaveChangesAsync();
         }
 
-        public async Task<ProductOption> GetProductOptionById(int productId, int id) {
+        public async Task<ProductOption> GetProductOptionById(int productId, int id)
+        {
             return await _context.ProductOptions.FirstOrDefaultAsync(x => x.productId == productId && x.Id == id);
         }
-        public async Task<IEnumerable<ProductOption>> GetProductOptions(int productId){
+        public async Task<IEnumerable<ProductOption>> GetProductOptions(int productId)
+        {
             return await _context.ProductOptions.Where(x => x.productId == productId).ToListAsync();
 
         }
-        
+
     }
 }

@@ -30,7 +30,7 @@ namespace APIXunit.Tests
             //Arrange
             int Id = 100;
 
-            var productDtoOld = new ProductDto()
+            var productDtoOld = new Product()
             {
                 Name = "Book",
                 Description = "Fiction Books",
@@ -48,7 +48,7 @@ namespace APIXunit.Tests
                 };
 
 
-            _productRepositoryMock.Setup(x => x.GetProductById(Id)).ReturnsAsync((Product)null);
+            _productRepositoryMock.Setup(x => x.GetProductById(Id)).ReturnsAsync(productDtoOld);
 
             _productRepositoryMock.Setup(x => x.UpdateProduct(Id, productDtoModified)).Verifiable();
 

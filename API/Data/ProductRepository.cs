@@ -17,26 +17,30 @@ namespace API.Data
         public ProductRepository(DataContext context, IMapper mapper)
         {
             _context = context;
-             _mapper = mapper;
+            _mapper = mapper;
         }
 
-        public async Task CreateProduct(ProductDto productDto){
+        public async Task CreateProduct(ProductDto productDto)
+        {
 
             var product = _mapper.Map<Product>(productDto);
             _context.Products.Add(product);
             await _context.SaveChangesAsync();
         }
 
-        public async Task DeleteProduct(int Id) {            
+        public async Task DeleteProduct(int Id)
+        {
             var product = await _context.Products.FindAsync(Id);
             _context.Products.Remove(product);
             await _context.SaveChangesAsync();
         }
 
-        public async Task<Product> GetProductById(int id) {
+        public async Task<Product> GetProductById(int id)
+        {
             return await _context.Products.FindAsync(id);
         }
-        public async Task<IEnumerable<Product>> GetProducts(){
+        public async Task<IEnumerable<Product>> GetProducts()
+        {
             return await _context.Products.ToListAsync();
 
         }
@@ -50,8 +54,10 @@ namespace API.Data
             await _context.SaveChangesAsync();
         }
 
-        public async Task<Product> GetProductByProductOption(int id) {
-            return await _context.Products.Where(x=> x.Id == id).Include(x => x.ProductOpt).FirstOrDefaultAsync();
+        public async Task<Product> GetProductByProductOption(int id)
+        {
+            var productlist = await _context.Products.Where(x => x.Id == id).Include(x => x.ProductOpt).ToListAsync();
+            return productlist.FirstOrDefault();
         }
     }
 }
